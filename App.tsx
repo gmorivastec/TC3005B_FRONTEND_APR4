@@ -1,10 +1,32 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Button } from 'react-native';
+
+// everything is done through components
+
+// props 
+// la manera de agregar atributos parametrizables al componente 
+const Gatito = (props:any) => {
+
+  // los componentes regresan algún tipo de view
+  return(<View>
+      <Text>ESTO ES UN GATITO Y SU NOMBRE ES: {props.nombre}</Text>
+      <Button
+        title="EL GATITO"
+        onPress={() => {
+          alert("UN MIAU " + props.mensaje);
+        }}
+       />
+    </View>);
+}
 
 export default function App() {
+  // JSX
+  // syntaxis that looks like html
+  // used to define objects
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+      <Text>HEY EVERYONE! </Text>
+      <Gatito />
       <StatusBar style="auto" />
     </View>
   );
