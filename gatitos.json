@@ -1,0 +1,7 @@
+[
+    {"nombre": "a", "peso": 2, "edad": 1},
+    {"nombre": "b", "peso": 3, "edad": 2},
+    {"nombre": "c", "peso": 4, "edad": 3},
+    {"nombre": "d", "peso": 5, "edad": 4},
+    {"nombre": "e", "peso": 6, "edad": 5}
+]
