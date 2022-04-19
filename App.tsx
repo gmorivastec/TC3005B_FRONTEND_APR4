@@ -72,25 +72,45 @@ const Principal = ({navigation} : any) => {
   // syntaxis that looks like html
   // used to define objects
   /* 
+
+  
   
   */
+
+  const[cargando, setCargando] = useState(true);
+  const[datos, setDatos] = useState([]);
+
+  const solicitud = async() => {
+
+    var respuesta = await fetch("https://raw.githubusercontent.com/gmorivastec/TC3005B_FRONTEND_APR4/master/gatitos.json");
+    setDatos(await respuesta.json());
+    setCargando(false);
+  }
+
+  solicitud();
+
   return (
     <View style={styles.container}>
       <Text>HEY EVERYONE! </Text>
-      <Gatito nombre="Misifus" mensaje="MIAU" />
-      <Gatito nombre="Fluffy" mensaje="MIAU2" />
-      <Gatito nombre="Gatito" mensaje="MIAU3" />
-      <Gatito nombre="Garfiol" mensaje="MIAU4" />
-      {/* 
-      <FlatList
-        data = {[]}
-        renderItem = {}
-      />    
-      */}
+
+      {cargando && <Text>CARGANDO...</Text>}
+      {datos && (
+        <FlatList 
+          data={datos}
+          renderItem={({item} : any) =>
+            <Gatito 
+              nombre={item.nombre}
+              mensaje={item.nombre}
+            />
+          }
+        />
+      )}
+
+      
       <Button
         title="VE AL DETALLE"
         onPress={() => {
-          navigation.navigate("Detalle");
+          navigation.navigate("Detalle", {unDato: "pruebita1", otroDato: "pruebita2"});
         }}
        />
       <StatusBar style="auto" />
@@ -98,11 +118,12 @@ const Principal = ({navigation} : any) => {
   );
 }
 
-const Detalle = ({navigation} : any) => {
+const Detalle = ({navigation, route} : any) => {
 
   return (
     <View style={styles.container}>
-      <Text> INFO IMPORTANTE AQUI </Text>
+      <Text> INFO IMPORTANTE AQUI {route.params.unDato} </Text>
+      <Text> MAS INFO IMPORTANTE ACÁ {route.params.otroDato} </Text>
     </View>
   );
 }
