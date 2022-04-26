@@ -1,10 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { StyleSheet, Text, View, Button, FlatList } from 'react-native';
+import { StyleSheet, Text, View, Button, FlatList, TextInput } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator();
+// ESTRICTAMENTE TEMPORAL
+var global_user = "";
+var global_password = ""; 
 
 // everything is done through components
 
@@ -49,11 +52,25 @@ const Gatito = (props:any) => {
     </View>);
 }
 
+const linking = {
+  enabled: true,
+  config: {
+    screens: {
+      Login: '',
+      Principal: '/main'
+    }
+  }
+};
+
 export default function App() {
   // aquí dejamos el puro controlador de navegación
   return(
     <NavigationContainer linking={{enabled: true}}>
       <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen 
+          name="Login"
+          component={Login}
+        />
         <Stack.Screen 
           name="Principal"
           component={Principal}
@@ -64,6 +81,77 @@ export default function App() {
         />
       </Stack.Navigator>
     </NavigationContainer>
+  );
+}
+
+const Login = ({navigation} : any) => {
+  const[user, setUser] = useState("");
+  const[password, setPassword] = useState("");
+  const[mensajeDeError, setMensajeDeError] = useState("");
+
+  const login = async() => {
+
+    // vamos a seguir usando fetch
+    
+    // para mandar info vamos a crear un objeto formdata
+    const formData = new FormData();
+    formData.append('email', user);
+    formData.append('pass', password);
+
+    // solicitud con POST y con datos 
+    var response = 
+    await fetch('http://127.0.0.1:5000/login', {
+      method: 'POST',
+      body: formData
+    });
+
+
+    alert(await response.text() + " ::: " + response.status);
+    if(response.status == 200){
+      global_user = user;
+      global_password = password;
+    }
+  }
+
+  const protegido = async () => {
+
+    var headers = new Headers();
+    // Authorization Basic
+
+    headers.append("Authorization", global_user + ":" + global_password);
+    var response = await fetch('http://127.0.0.1:5000/protegido', {headers: headers});
+    alert(await response.text() + " --- " + response.status);
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text>{mensajeDeError}</Text>
+      <TextInput 
+        placeholder='user'
+        onChangeText={text => {
+          setUser(text);
+        }}
+      />
+      <TextInput 
+        placeholder='password'
+        secureTextEntry={true}
+        onChangeText={text => {
+          setPassword(text);
+        }}
+      />
+      <Button 
+        title="LOGIN"
+        onPress={() => {
+          login();
+        }}
+      />
+      <Button 
+        title="PROTEGIDO"
+        onPress={() => {
+          protegido();
+        }}
+      />
+    </View>
   );
 }
 
@@ -82,7 +170,8 @@ const Principal = ({navigation} : any) => {
 
   const solicitud = async() => {
 
-    var respuesta = await fetch("https://raw.githubusercontent.com/gmorivastec/TC3005B_FRONTEND_APR4/master/gatitos.json");
+    //var respuesta = await fetch("https://raw.githubusercontent.com/gmorivastec/TC3005B_FRONTEND_APR4/master/gatitos.json");
+    var respuesta = await fetch("http://127.0.0.1:5000/");
     setDatos(await respuesta.json());
     setCargando(false);
   }
