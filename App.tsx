@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View, Button, FlatList, TextInput } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createNativeStackNavigator();
 // ESTRICTAMENTE TEMPORAL
@@ -106,10 +107,21 @@ const Login = ({navigation} : any) => {
     });
 
 
-    alert(await response.text() + " ::: " + response.status);
+    //alert(await response.text() + " ::: " + response.status);
     if(response.status == 200){
+
+      const datosLogin = await response.json(); 
+
+      console.log(datosLogin);
+      /*
       global_user = user;
       global_password = password;
+      */
+
+      // también se puede guardar en memoria
+      await AsyncStorage.setItem("user", user);
+      await AsyncStorage.setItem("token", datosLogin.token);
+      await AsyncStorage.setItem("validez", datosLogin.caducidad);
     }
   }
 
@@ -118,9 +130,31 @@ const Login = ({navigation} : any) => {
     var headers = new Headers();
     // Authorization Basic
 
-    headers.append("Authorization", global_user + ":" + global_password);
+    // obtener valores locales
+    var user = await AsyncStorage.getItem("user");
+    var token = await AsyncStorage.getItem("token");
+
+    headers.append("Authorization", user + ":" + token);
     var response = await fetch('http://127.0.0.1:5000/protegido', {headers: headers});
     alert(await response.text() + " --- " + response.status);
+  }
+
+  const logout = async () => {
+
+    var headers = new Headers();
+    // Authorization Basic
+
+    // obtener valores locales
+    var user = await AsyncStorage.getItem("user");
+    var token = await AsyncStorage.getItem("token");
+
+    headers.append("Authorization", user + ":" + token);
+    var response = await fetch('http://127.0.0.1:5000/logout', {headers: headers});
+    alert(await response.text() + " --- " + response.status);
+
+    // mantenimiento local
+    await AsyncStorage.removeItem("user");
+    await AsyncStorage.removeItem("token");
   }
 
   return (
@@ -149,6 +183,12 @@ const Login = ({navigation} : any) => {
         title="PROTEGIDO"
         onPress={() => {
           protegido();
+        }}
+      />
+      <Button 
+        title="LOGOUT"
+        onPress={() => {
+          logout();
         }}
       />
     </View>
